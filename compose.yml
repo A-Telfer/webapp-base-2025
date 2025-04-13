@@ -1,0 +1,42 @@
+services:
+  nginx:
+    image: nginx
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./services/nginx/nginx.conf:/etc/nginx/nginx.conf:ro
+    command: [nginx-debug, '-g', 'daemon off;']
+    networks:
+      - myapp
+
+  frontend:
+    image: frontend
+    stdin_open: true
+    tty: true
+    build:
+      context: ./services/frontend
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/frontend:/app
+    working_dir: /app
+    networks:
+      - myapp
+
+
+  backend:
+    image: backend
+    build:
+      context: ./services/backend
+      dockerfile: Dockerfile
+    volumes:
+      - ./services/backend:/app
+    working_dir: /app
+    command: uv run python manage.py runserver 0.0.0.0:8000
+    networks:
+      - myapp
+
+networks:
+  myapp: 
+    driver: bridge
+    driver_opts:
+      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
