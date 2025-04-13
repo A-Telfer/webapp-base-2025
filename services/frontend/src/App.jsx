@@ -6,6 +6,20 @@ import './App.css'
 function App() {
   const [count, setCount] = useState(0)
 
+  const handleClick = () => {
+    fetch("/api")
+      .then((response) => {
+        if (!response.ok) {
+          throw new Error("Network response was not ok");
+        }
+        return response.json();
+      }
+    ).then((data) => {
+        setCount(data.count)
+      }
+    )
+  }
+  
   return (
     <>
       <div>
@@ -18,7 +32,7 @@ function App() {
       </div>
       <h1>Vite + React</h1>
       <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
+        <button onClick={handleClick}>
           count is {count}
         </button>
         <p>
