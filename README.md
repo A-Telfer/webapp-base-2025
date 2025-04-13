@@ -55,6 +55,77 @@ Notes
 - Ambiguous where to put the `.pg_service.conf` and `.pgpass` files, solved using the `PGSERVICEFILE` environment variable and modifying settings.py to point an absolute path for the `passfile`
 - Prefer use of files and env variables that are easier to securely manage (env variables are loaded as docker secrets and are not exposed in the containers)
 
+## Adding a django app
+1. Create the django app [docs](https://docs.djangoproject.com/en/5.2/intro/tutorial01/)
+  - when settings up the urls.py, be conscious of the nginx configuration (ie for this repo, nginx maps '/api' -> '/')
+2. Create a custom model (in my case to track button pressess). Follow the django tutorials for applying the model to the db using `makemigrations` and `migrate` [2](https://docs.djangoproject.com/en/5.2/intro/tutorial02/)[3](https://docs.djangoproject.com/en/5.2/intro/tutorial02/) 
+3. Modify the view to perform an operation, eg
+    ```python
+    def index(request):
+        get_last_pressed = ButtonPress.objects.order_by("last_pressed").last()
+        if get_last_pressed is None:
+            count = 0
+        else:
+            count = get_last_pressed.count
+
+        create_button = ButtonPress.objects.create(count=count + 1)
+        return JsonResponse(data={"count": create_button.count, "last_pressed": create_button.last_pressed}, status=200)
+    ```
+
+4. Modify react to call the backend
+    eg App.jsx
+    ```jsx
+    import { useState } from 'react'
+    import reactLogo from './assets/react.svg'
+    import viteLogo from '/vite.svg'
+    import './App.css'
+
+    function App() {
+        const [count, setCount] = useState(0)
+
+        const handleClick = () => {
+            fetch("/api")
+            .then((response) => {
+                if (!response.ok) {
+                throw new Error("Network response was not ok");
+                }
+                return response.json();
+            }
+            ).then((data) => {
+                setCount(data.count)
+            }
+            )
+        }
+        
+        return (
+            <>
+            <div>
+                <a href="https://vite.dev" target="_blank">
+                <img src={viteLogo} className="logo" alt="Vite logo" />
+                </a>
+                <a href="https://react.dev" target="_blank">
+                <img src={reactLogo} className="logo react" alt="React logo" />
+                </a>
+            </div>
+            <h1>Vite + React</h1>
+            <div className="card">
+                <button onClick={handleClick}>
+                count is {count}
+                </button>
+                <p>
+                Edit <code>src/App.jsx</code> and save to test HMR
+                </p>
+            </div>
+            <p className="read-the-docs">
+                Click on the Vite and React logos to learn more
+            </p>
+            </>
+        )
+    }
+    export default App
+    ```
+5. Run the application and click the button! It will increment between page refreshes and if you put the docker app up/down again
+
 ## Adding a separate process with signals in django
 
 ## Adding Celery to backend
