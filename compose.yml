@@ -30,8 +30,28 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./services/backend:/app
+    environment:
+      PGSERVICEFILE: /run/secrets/pg_service
+    secrets:
+      - pg_service
+      - pgpass
     working_dir: /app
     command: uv run python manage.py runserver 0.0.0.0:8000
+    networks:
+      - myapp
+    depends_on:
+      - db
+
+  db:
+    image: postgres
+    environment:
+      POSTGRES_USER: test-user
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres_password
+      POSTGRES_DB: test-db
+    secrets:
+      - postgres_password
+    volumes:
+      - db_data:/var/lib/postgresql/data
     networks:
       - myapp
 
@@ -40,3 +60,19 @@ networks:
     driver: bridge
     driver_opts:
       com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+
+volumes:
+  db_data:
+    name: db_data
+
+secrets:
+  postgres_password:
+    environment: DB_PASSWORD
+  
+  pg_service:
+    file: ./secrets/.pg_service.conf
+
+  pgpass:
+    file: ./secrets/.pgpass
+
+  

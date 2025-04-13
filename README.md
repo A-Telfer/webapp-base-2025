@@ -28,7 +28,32 @@ The easiest way to setup nginx is with docker
 3. Create docker files for the frontend (from nodejs for vite) and backend (ubuntu)
 4. Create the services/nginx/nginx.conf file that proxies the frontend host:port (eg http://frontend:5173) and backend (eg http://backend:8000)
 
-## Adding Postgres and Rabbitmq
+## Adding Postgres
+Following the [docs](https://docs.djangoproject.com/en/5.2/ref/databases/#optimizing-postgresql-s-configuration)
+
+1. Rename the .env -> .env.template file and choose a password for the db
+    ```
+    DB_PASSWORD=YOUR-PASSWORD
+    ```
+
+2. In secrets, create two files
+    .pg_service.conf
+    ```
+    [core_api]
+    host=db
+    user=test-user
+    dbname=test-db
+    port=5432
+    ```
+
+    .pgpass
+    ```
+    db:5432:test-db:test-user:YOUR-PASSWORD
+    ```
+
+Notes
+- Ambiguous where to put the `.pg_service.conf` and `.pgpass` files, solved using the `PGSERVICEFILE` environment variable and modifying settings.py to point an absolute path for the `passfile`
+- Prefer use of files and env variables that are easier to securely manage (env variables are loaded as docker secrets and are not exposed in the containers)
 
 ## Adding a separate process with signals in django
 
