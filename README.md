@@ -28,6 +28,13 @@ The easiest way to setup nginx is with docker
 3. Create docker files for the frontend (from nodejs for vite) and backend (ubuntu)
 4. Create the services/nginx/nginx.conf file that proxies the frontend host:port (eg http://frontend:5173) and backend (eg http://backend:8000)
 
+## Adding Postgres and Rabbitmq
+
+## Adding a separate process with signals in django
+
+## Adding Celery to backend
+
+## Adding django channels
 
 ## Where to go from here
 This setup is aimed at dev. A strategy for switching this to prod would be
