@@ -8,6 +8,9 @@ services:
     command: [nginx-debug, '-g', 'daemon off;']
     networks:
       - myapp
+    depends_on:
+      - frontend
+      - backend
 
   frontend:
     image: frontend
