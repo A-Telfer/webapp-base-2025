@@ -4,19 +4,17 @@ from django.db import migrations, models
 
 
 class Migration(migrations.Migration):
-
     initial = True
 
-    dependencies = [
-    ]
+    dependencies = []
 
     operations = [
         migrations.CreateModel(
-            name='ButtonPress',
+            name="ButtonPress",
             fields=[
-                ('id', models.AutoField(primary_key=True, serialize=False)),
-                ('count', models.IntegerField(default=0)),
-                ('last_pressed', models.DateTimeField(auto_now=True, db_index=True)),
+                ("id", models.AutoField(primary_key=True, serialize=False)),
+                ("count", models.IntegerField(default=0)),
+                ("last_pressed", models.DateTimeField(auto_now=True, db_index=True)),
             ],
         ),
     ]
