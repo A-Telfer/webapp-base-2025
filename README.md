@@ -12,7 +12,7 @@
 
 ## Setting up the backend structure
 1. Install uv `pip install uv`
-2. Create a project `uv init --bare --python 3.13 services/backend`
+2. Create a project `uv init --bare --python 3.13 --build-backend setuptools services/backend`
 3. Install django
     ```
     cd services/backend
@@ -126,9 +126,15 @@ Notes
     ```
 5. Run the application and click the button! It will increment between page refreshes and if you put the docker app up/down again
 
-## Adding a separate process with signals in django
-
 ## Adding Celery to backend
+1. Setup rabbitmq 
+  - Create a rabbitmq.conf file with credentials
+  - Verify this is working before moving on
+2. Setup django for celery [docs](https://docs.celeryq.dev/en/latest/django/first-steps-with-django.html)
+2. In settings.py, setup rabbitmq as the broker for celery, [docs](https://docs.celeryq.dev/en/stable/getting-started/backends-and-brokers/rabbitmq.html)
+4. In settings.py, setup postgres as celery's result backend, [docs](https://docs.celeryq.dev/en/stable/userguide/configuration.html#conf-database-result-backend)
+
+## Adding a separate process with signals in django
 
 ## Adding django channels
 
