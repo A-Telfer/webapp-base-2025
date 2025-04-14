@@ -35,9 +35,13 @@ services:
       - ./services/backend:/app
     environment:
       PGSERVICEFILE: /run/secrets/pg_service
+      CELERY_BROKER_URL_FILE: /run/secrets/celery_broker_url
+      CELERY_RESULT_BACKEND_FILE: /run/secrets/celery_result_backend
     secrets:
       - pg_service
       - pgpass
+      - celery_broker_url
+      - celery_result_backend
     working_dir: /app
     command: uv run python manage.py runserver 0.0.0.0:8000
     networks:
@@ -58,19 +62,38 @@ services:
     networks:
       - myapp
 
-networks:
-  myapp: 
-    driver: bridge
-    driver_opts:
-      com.docker.network.bridge.host_binding_ipv4: "127.0.0.1"
+  rabbitmq:
+    image: rabbitmq:4-management
+    hostname: rabbitmq
+    environment:
+      RABBITMQ_CONFIG_FILE: /run/secrets/rabbitmq.conf
+      RABBITMQ_NODENAME: rabbit@rabbitmq
+    secrets:
+      - rabbitmq.conf
+    networks:
+      - myapp
 
+networks:
+  myapp:
 volumes:
   db_data:
     name: db_data
+  
+  rabbitmq_data:
+    name: rabbitmq_data
 
 secrets:
   postgres_password:
-    environment: DB_PASSWORD
+    file: ./secrets/postgres_password
+
+  celery_broker_url:
+    environment: CELERY_BROKER_URL
+
+  celery_result_backend:
+    environment: CELERY_RESULT_BACKEND
+
+  rabbitmq.conf:
+    file: ./secrets/rabbitmq.conf
   
   pg_service:
     file: ./secrets/.pg_service.conf
