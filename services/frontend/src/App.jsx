@@ -2,11 +2,53 @@ import { useState } from 'react'
 import reactLogo from './assets/react.svg'
 import viteLogo from '/vite.svg'
 import './App.css'
+import useWebSocket from 'react-use-websocket';
+
+const WS_URL = 'ws://127.0.0.1:8080/api/ws';
 
 function App() {
   const [count, setCount] = useState(0)
 
+  const { sendMessage, lastMessage, readyState } = useWebSocket(WS_URL, {
+    onOpen: () => {
+      console.log('WebSocket connection established.');
+    },
+    onClose: () => {
+      console.log('WebSocket connection closed.');
+    },
+    onError: (event) => {
+      console.error('WebSocket error:', event);
+    },
+    onMessage: (event) => {
+      const data = JSON.parse(event.data);
+      console.log('WebSocket message received:', data);
+      // if (data.count !== undefined) {
+      //   setCount(data.count);
+      // }
+    },
+  });
+  // useWebSocket(WS_URL, {
+  //   onOpen: () => {
+  //     console.log('WebSocket connection established.');
+  //   },
+
+  //   onClose: () => {
+  //     console.log('WebSocket connection closed.');
+  //   },
+  //   onError: (event) => {
+  //     console.error('WebSocket error:', event);
+  //   },
+  //   onMessage: (event) => {
+  //     const data = JSON.parse(event.data);
+  //     console.log('WebSocket message received:', data);
+  //     if (data.count !== undefined) {
+  //       setCount(data.count);
+  //     }
+  //   },
+  // });
+
   const handleClick = () => {
+    sendMessage(JSON.stringify({ message: 'increment' }));
     fetch("/api")
       .then((response) => {
         if (!response.ok) {
